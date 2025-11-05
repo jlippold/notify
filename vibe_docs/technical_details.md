@@ -44,6 +44,7 @@ _This document contains all technical decisions and implementation details._
   - POST `/push/unsubscribe` – unsubscribe user/device from topic(s)
   - GET `/push/topics` – list available topics
   - POST `/topics/ensure` – ensure topic exists (dynamic create) by slug
+  - POST `/publish/device` – send to a single device by `deviceId` or `endpointArn`
 
 Payload fields we support:
 - iOS (APNS): `aps.alert`, `aps.badge`, `aps.sound`, `aps.category`, custom `link` field for deep links
@@ -65,6 +66,13 @@ Publishing helpers:
 - ensureTopic(slug) → returns `sns_topic_arn` (lazy create + cache in DB)
 - subscribeDeviceToTopic(deviceEndpointArn, topicArn) → returns subscription ARN
 - publishToTopic(topicArn, payload) → handles APNS/FCM payload mapping (badges/sounds/link)
+- publishToEndpoint(endpointArn, payload) → send to a single device endpoint
+
+Single-device send details:
+- Endpoint: POST `/publish/device`
+- Auth: owner of device, or elevated roles ('School Admin' or 'School Staff')
+- Body: `{ deviceId?: string, endpointArn?: string, payload: { title, body, sound?, badge?, link? } }`
+- Behavior: if `deviceId` provided, server validates ownership/authorization, loads `sns_endpoint_arn`, then publishes using `publishToEndpoint`
 
 ## 📁 Project Structure
 
