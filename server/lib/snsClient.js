@@ -44,6 +44,13 @@ async function publishToTopic(topicArn, payload) {
   return res.MessageId;
 }
 
+async function publishToEndpoint(endpointArn, payload) {
+  const Message = buildPlatformMessage(payload);
+  const params = { TargetArn: endpointArn, MessageStructure: 'json', Message };
+  const res = await sns.send(new PublishCommand(params));
+  return res.MessageId;
+}
+
 function buildPlatformMessage({ title, body, sound, badge, link }) {
   const apnsPayload = {
     aps: {
@@ -71,6 +78,7 @@ module.exports = {
   subscribeDeviceToTopic,
   unsubscribeDeviceFromTopic,
   publishToTopic,
+  publishToEndpoint,
 };
 
 

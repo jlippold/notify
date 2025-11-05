@@ -1,6 +1,6 @@
 const express = require('express');
 const { query } = require('../lib/db');
-const { ensureTopic, publishToTopic } = require('../lib/snsClient');
+const { ensureTopic, publishToTopic, publishToEndpoint } = require('../lib/snsClient');
 
 const router = express.Router();
 
@@ -52,6 +52,26 @@ router.post('/role', requireAuth, requireAdmin, async (req, res) => {
   const arn = await ensureTopic(slug, slug);
   const messageId = await publishToTopic(arn, payload);
   res.json({ topicArn: arn, messageId });
+});
+
+router.post('/device', requireAuth, async (req, res) => {
+  const { deviceId, endpointArn, payload } = req.body || {};
+  if (!payload || (!deviceId && !endpointArn)) return res.status(400).json({ error: 'Missing deviceId/endpointArn or payload' });
+
+  let endpoint = endpointArn;
+  if (!endpoint && deviceId) {
+    const d = await query('SELECT user_id, sns_endpoint_arn FROM devices WHERE id=$1', [deviceId]);
+    if (!d.rows[0]) return res.status(404).json({ error: 'Device not found' });
+    const ownerId = d.rows[0].user_id;
+    const role = req.session.user.role;
+    const isElevated = role === 'School Admin' || role === 'School Staff';
+    if (!isElevated && ownerId !== req.session.user.id) return res.status(403).json({ error: 'Forbidden' });
+    endpoint = d.rows[0].sns_endpoint_arn;
+    if (!endpoint) return res.status(409).json({ error: 'Device has no endpoint ARN' });
+  }
+
+  const messageId = await publishToEndpoint(endpoint, payload);
+  res.json({ endpointArn: endpoint, messageId });
 });
 
 module.exports = router;
