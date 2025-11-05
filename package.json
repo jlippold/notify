@@ -1,0 +1,31 @@
+{
+  "name": "vibe-coding-template-server",
+  "version": "0.1.0",
+  "private": true,
+  "main": "server/app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/app.js",
+    "dev": "NODE_ENV=development node server/app.js",
+    "seed": "node server/scripts/seed.js",
+    "login:admin": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -i -c $COOKIES -X POST \"$BASE/auth/login\" -H \"Content-Type: application/json\" -d \"{\\\"email\\\":\\\"admin@school.test\\\",\\\"password\\\":\\\"password123\\\"}\"'",
+    "login:staff": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -i -c $COOKIES -X POST \"$BASE/auth/login\" -H \"Content-Type: application/json\" -d \"{\\\"email\\\":\\\"teacher@school.test\\\",\\\"password\\\":\\\"password123\\\"}\"'",
+    "login:student": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -i -c $COOKIES -X POST \"$BASE/auth/login\" -H \"Content-Type: application/json\" -d \"{\\\"email\\\":\\\"student@school.test\\\",\\\"password\\\":\\\"password123\\\"}\"'",
+    "login:guardian": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -i -c $COOKIES -X POST \"$BASE/auth/login\" -H \"Content-Type: application/json\" -d \"{\\\"email\\\":\\\"parent@school.test\\\",\\\"password\\\":\\\"password123\\\"}\"'",
+    "register:device": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; PLATFORM=${PLATFORM:-ios}; TOKEN=${DEVICE_TOKEN:?Set DEVICE_TOKEN}; curl -b $COOKIES -X POST \"$BASE/push/register\" -H \"Content-Type: application/json\" -d \"{\\\"platform\\\":\\\"$PLATFORM\\\",\\\"deviceToken\\\":\\\"$TOKEN\\\"}\"'",
+    "publish:course:students": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; COURSE=${COURSE_ID:-MATH101}; curl -b $COOKIES -X POST \"$BASE/publish/course\" -H \"Content-Type: application/json\" -d \"{\\\"courseId\\\":\\\"$COURSE\\\",\\\"audience\\\":\\\"students\\\",\\\"type\\\":\\\"notification\\\",\\\"payload\\\":{\\\"title\\\":\\\"Welcome\\\",\\\"body\\\":\\\"See syllabus\\\",\\\"sound\\\":\\\"default\\\",\\\"badge\\\":1,\\\"link\\\":\\\"app://course/$COURSE\\\"}}\"'",
+    "publish:course:guardians:attendance": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; COURSE=${COURSE_ID:-MATH101}; curl -b $COOKIES -X POST \"$BASE/publish/course\" -H \"Content-Type: application/json\" -d \"{\\\"courseId\\\":\\\"$COURSE\\\",\\\"audience\\\":\\\"guardians\\\",\\\"type\\\":\\\"attendance\\\",\\\"payload\\\":{\\\"title\\\":\\\"Attendance\\\",\\\"body\\\":\\\"Attendance update posted\\\",\\\"sound\\\":\\\"default\\\",\\\"link\\\":\\\"app://attendance/$COURSE\\\"}}\"'",
+    "publish:role:guardians": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -b $COOKIES -X POST \"$BASE/publish/role\" -H \"Content-Type: application/json\" -d \"{\\\"role\\\":\\\"guardian\\\",\\\"payload\\\":{\\\"title\\\":\\\"School Update\\\",\\\"body\\\":\\\"Early dismissal today\\\",\\\"sound\\\":\\\"default\\\"}}\"'",
+    "topics:list": "sh -c 'BASE=${BASE:-http://localhost:3000}; COOKIES=${COOKIES:-cookie.txt}; curl -b $COOKIES \"$BASE/topics/list\"'"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.676.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.17.3",
+    "pg": "^8.12.0"
+  }
+}
+
+
